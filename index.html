@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FitCalc TDEE Calculator — estimate your daily calorie needs, BMR, and macros based on your stats and goal. Free, no account required.">
+<meta property="og:title" content="FitCalc — TDEE Calculator">
+<meta property="og:description" content="Calculate your BMR, TDEE, daily calorie target, and macros. Free fitness utility, no account required.">
+<meta property="og:type" content="website">
+<title>FitCalc — TDEE Calculator</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/tdee.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a href="index.html" class="site-header__logo">FitCalc</a>
+    <nav class="site-nav">
+      <a href="index.html" class="site-nav__link is-active">TDEE Calculator</a>
+      <a href="workout.html" class="site-nav__link">Workout Planner</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+
+  <h1 class="page-title">TDEE Calculator</h1>
+  <p class="page-subtitle">Calculate your estimated daily calorie needs.</p>
+
+  <div class="layout">
+  <div class="layout__col">
+
+  <!-- ===================== YOUR DETAILS + YOUR GOAL (combined) ===================== -->
+  <section class="card" id="details-section">
+    <h2 class="card__title">Your Details</h2>
+
+    <form id="tdee-form">
+      <div class="field">
+        <label class="field__label">Gender</label>
+        <div class="toggle-group" id="gender-toggle">
+          <button type="button" class="toggle-btn is-active" data-value="male">Male</button>
+          <button type="button" class="toggle-btn" data-value="female">Female</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="age">Age</label>
+        <div class="input-suffix input-suffix--narrow">
+          <input type="number" id="age" name="age" min="13" max="90" required>
+          <span class="suffix">years</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field__label-row">
+          <label class="field__label" for="weight">Weight</label>
+          <div class="toggle-group toggle-group--small" id="weight-unit-toggle">
+            <button type="button" class="toggle-btn is-active" data-value="kg">kg</button>
+            <button type="button" class="toggle-btn" data-value="lbs">lbs</button>
+          </div>
+        </div>
+        <div class="input-suffix input-suffix--narrow">
+          <input type="number" id="weight" name="weight" min="30" max="300" step="0.01" required>
+          <span class="suffix" id="weight-suffix">kg</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field__label-row">
+          <label class="field__label" for="height-cm">Height</label>
+          <div class="toggle-group toggle-group--small" id="height-unit-toggle">
+            <button type="button" class="toggle-btn is-active" data-value="cm">cm</button>
+            <button type="button" class="toggle-btn" data-value="ftin">ft/in</button>
+          </div>
+        </div>
+
+        <div class="input-suffix input-suffix--narrow" id="height-cm-wrap">
+          <input type="number" id="height-cm" name="height-cm" min="100" max="250" step="0.1" required>
+          <span class="suffix">cm</span>
+        </div>
+
+        <div class="field-row is-hidden" id="height-ftin-wrap">
+          <div class="input-suffix">
+            <input type="number" id="height-ft" name="height-ft" min="1" max="8" step="1">
+            <span class="suffix">ft</span>
+          </div>
+          <div class="input-suffix">
+            <input type="number" id="height-in" name="height-in" min="0" max="11" step="0.1">
+            <span class="suffix">in</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="activity">Activity Level</label>
+        <select id="activity" name="activity" required>
+          <option value="" disabled selected>Select activity level</option>
+          <option value="sedentary">Sedentary (little or no exercise)</option>
+          <option value="light">Light (1–3 days/week)</option>
+          <option value="moderate">Moderate (3–5 days/week)</option>
+          <option value="active">Active (6–7 days/week)</option>
+          <option value="very_active">Very active (hard exercise + physical job)</option>
+        </select>
+      </div>
+
+      <div class="field field--narrow">
+        <label class="field__label" for="bodyfat">
+          Body Fat % <span class="optional-tag">(optional)</span>
+          <button type="button" class="info-icon" id="bodyfat-info-btn" title="What is body fat %? Click for a reference chart.">?</button>
+        </label>
+        <div class="input-suffix">
+          <input type="number" id="bodyfat" name="bodyfat" min="3" max="60" step="0.1">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+
+      <!-- Body fat % reference chart popup -->
+      <div class="info-popup-overlay is-hidden" id="bodyfat-popup-overlay">
+        <div class="info-popup">
+          <button type="button" class="info-popup__close" id="bodyfat-popup-close" aria-label="Close">&times;</button>
+          <img src="image/bodyfatRef.jpg" alt="Body fat percentage reference chart" class="info-popup__image">
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+      <h3 class="card__subtitle">Your Goal</h3>
+
+      <div class="toggle-group" id="goal-toggle">
+        <button type="button" class="toggle-btn" data-value="cut">Cut</button>
+        <button type="button" class="toggle-btn" data-value="maintain">Maintain</button>
+        <button type="button" class="toggle-btn" data-value="bulk">Bulk</button>
+      </div>
+
+      <!-- CUT options -->
+      <div class="goal-options is-hidden" id="cut-options">
+        <label class="field__label">Deficit</label>
+        <div class="toggle-group" id="cut-toggle">
+          <button type="button" class="toggle-btn" data-value="250">-250 kcal</button>
+          <button type="button" class="toggle-btn" data-value="500">-500 kcal</button>
+          <button type="button" class="toggle-btn" data-value="1000">-1000 kcal</button>
+        </div>
+        <p class="warning-text is-hidden" id="aggressive-warning">
+          ⚠ This is an aggressive deficit. Large calorie deficits may not be appropriate for everyone.
+          Monitor recovery, hunger, training performance, and sustainability closely, and consider a
+          smaller deficit if performance or wellbeing suffers.
+        </p>
+      </div>
+
+      <!-- MAINTAIN options -->
+      <div class="goal-options is-hidden" id="maintain-options">
+        <p class="hint-text">Target: maintenance calories — no adjustment applied.</p>
+      </div>
+
+      <!-- BULK options -->
+      <div class="goal-options is-hidden" id="bulk-options">
+        <label class="field__label">Surplus</label>
+        <div class="toggle-group" id="bulk-toggle">
+          <button type="button" class="toggle-btn" data-value="250">+250 kcal</button>
+          <button type="button" class="toggle-btn" data-value="300">+300 kcal</button>
+        </div>
+        <p class="hint-text">
+          Monitor your weight trend over a few weeks and adjust from there, rather than increasing
+          calories further right away.
+        </p>
+      </div>
+
+      <!-- Daily Steps — only shown once a goal has been picked -->
+      <div class="goal-options is-hidden" id="steps-block">
+        <div class="section-divider"></div>
+        <h3 class="card__subtitle">Daily Steps</h3>
+
+        <ul class="steps-list">
+          <li><strong>8,000</strong> — Minimum baseline</li>
+          <li><strong>10,000</strong> — Recommended</li>
+          <li><strong>12,000+</strong> — Higher activity</li>
+        </ul>
+
+        <p class="hint-text">
+          This is a practical activity target, not a medical requirement — no specific step count is
+          required for health.
+        </p>
+
+        <div class="result-item">
+          <span class="result-item__label">Current target</span>
+          <span class="result-item__value" id="steps-target">— steps/day</span>
+        </div>
+      </div>
+
+      <p class="warning-text is-hidden" id="goal-required-error">
+        Please select a goal (Cut, Maintain, or Bulk) before calculating.
+      </p>
+
+      <button type="submit" class="btn btn--primary" id="calculate-btn">Calculate</button>
+    </form>
+  </section>
+
+  </div>
+  <div class="layout__col">
+
+  <!-- Placeholder shown until the user calculates their first result -->
+  <div class="placeholder-card" id="results-placeholder">
+    <p class="placeholder-card__text">
+      Fill in your details, choose a goal, and hit <strong>Calculate</strong> to see your BMR, TDEE,
+      daily calorie target, and macros here.
+    </p>
+  </div>
+
+  <!-- ===================== SECTION 3 — CALORIE RESULT ===================== -->
+  <section class="card is-hidden" id="result-section">
+    <h2 class="card__title">Calorie Result</h2>
+
+    <div class="result-grid">
+      <div class="result-item">
+        <span class="result-item__label">BMR</span>
+        <span class="result-item__value" id="result-bmr">—</span>
+      </div>
+      <div class="result-item">
+        <span class="result-item__label">Maintenance (TDEE)</span>
+        <span class="result-item__value" id="result-tdee">—</span>
+      </div>
+      <div class="result-item">
+        <span class="result-item__label">Goal</span>
+        <span class="result-item__value" id="result-goal">—</span>
+      </div>
+      <div class="result-item">
+        <span class="result-item__label">Adjustment</span>
+        <span class="result-item__value" id="result-adjustment">—</span>
+      </div>
+    </div>
+
+    <div class="result-highlight">
+      <span class="result-highlight__label">Daily Target</span>
+      <span class="result-highlight__value" id="result-target">— kcal/day</span>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 4 — MACROS ===================== -->
+  <section class="card is-hidden" id="macro-section">
+    <h2 class="card__title">Macros</h2>
+
+    <div class="field">
+      <label class="field__label">Preset</label>
+      <div class="toggle-group" id="macro-preset-toggle">
+        <button type="button" class="toggle-btn is-active" data-value="balanced">Balanced</button>
+        <button type="button" class="toggle-btn" data-value="high_protein">High Protein</button>
+        <button type="button" class="toggle-btn" data-value="high_carb">High Carb</button>
+        <button type="button" class="toggle-btn" data-value="high_fat">High Fat</button>
+      </div>
+    </div>
+
+    <div class="macro-bar" id="macro-bar">
+      <div class="macro-bar__segment macro-bar__segment--protein" id="bar-protein"></div>
+      <div class="macro-bar__segment macro-bar__segment--carbs" id="bar-carbs"></div>
+      <div class="macro-bar__segment macro-bar__segment--fat" id="bar-fat"></div>
+    </div>
+
+    <div class="macro-sliders">
+      <div class="macro-slider">
+        <label class="field__label" for="protein-pct">Protein <span id="protein-pct-label">30%</span></label>
+        <input type="range" id="protein-pct" min="10" max="60" value="30">
+      </div>
+      <div class="macro-slider">
+        <label class="field__label" for="carbs-pct">Carbohydrates <span id="carbs-pct-label">40%</span></label>
+        <input type="range" id="carbs-pct" min="10" max="70" value="40">
+      </div>
+      <div class="macro-slider">
+        <label class="field__label" for="fat-pct">Fat <span id="fat-pct-label">30%</span></label>
+        <input type="range" id="fat-pct" min="10" max="60" value="30">
+      </div>
+      <p class="hint-text" id="macro-total-hint">Total: 100%</p>
+    </div>
+
+    <div class="macro-grid">
+      <div class="macro-item">
+        <span class="macro-item__label">Protein</span>
+        <span class="macro-item__grams" id="macro-protein-grams">— g</span>
+        <span class="macro-item__pct" id="macro-protein-pct">30%</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-item__label">Carbohydrates</span>
+        <span class="macro-item__grams" id="macro-carbs-grams">— g</span>
+        <span class="macro-item__pct" id="macro-carbs-pct">40%</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-item__label">Fat</span>
+        <span class="macro-item__grams" id="macro-fat-grams">— g</span>
+        <span class="macro-item__pct" id="macro-fat-pct">30%</span>
+      </div>
+    </div>
+  </section>
+
+  </div>
+  </div>
+
+  <!-- ===================== SECTION 6 — DISCLAIMER ===================== -->
+  <footer class="disclaimer">
+    <p>Estimates are for educational and planning purposes only. Individual calorie needs vary.</p>
+    <p>No account required. No personal data is collected.</p>
+  </footer>
+
+</main>
+
+<script src="js/storage.js"></script>
+<script src="js/tdee.js"></script>
+<script src="js/macros.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>

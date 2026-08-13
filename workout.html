@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FitCalc Workout Planner — build your weekly training plan by day and track muscle volume against research-based guidelines. Free, no account required.">
+<meta property="og:title" content="FitCalc — Workout Planner">
+<meta property="og:description" content="Plan your weekly workouts by day and monitor muscle volume. Free fitness utility, no account required.">
+<meta property="og:type" content="website">
+<title>FitCalc — Workout Planner</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/workout.css">
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site-header">
+  <div class="site-header__inner">
+    <a href="index.html" class="site-header__logo">FitCalc</a>
+    <nav class="site-nav">
+      <a href="index.html" class="site-nav__link">TDEE Calculator</a>
+      <a href="workout.html" class="site-nav__link is-active">Workout Planner</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== MAIN ===================== -->
+<main class="page page--workout">
+
+  <div class="workout-header">
+    <div>
+      <h1 class="page-title">Workout Plan</h1>
+      <p class="page-subtitle">Build your weekly training plan and monitor muscle volume.</p>
+    </div>
+  </div>
+
+  <!-- Week selector row -->
+  <div class="week-bar">
+    <label class="week-bar__label" for="week-select">Week</label>
+    <select class="week-bar__select" id="week-select"></select>
+    <button class="btn btn--secondary btn--slim" id="prev-week-btn">&#8592; Previous Week</button>
+    <button class="btn btn--secondary btn--slim" id="next-week-btn">Next Week &#8594;</button>
+  </div>
+
+  <!-- Two-column body -->
+  <div class="workout-body">
+
+    <!-- LEFT: weekly plan by day -->
+    <div class="workout-body__left">
+      <div class="plan-header">
+        <span class="section-label">WEEKLY PLAN</span>
+      </div>
+
+      <div id="days-container"></div>
+
+      <div class="plan-footer">
+        <span class="plan-footer__note">
+          &#9432; <strong>Note:</strong> Only hard working sets are counted in weekly volume. Warm-up sets are excluded.
+        </span>
+        <div class="plan-footer__actions">
+          <button class="btn btn--danger btn--slim" id="reset-week-btn">&#128465; Reset Week</button>
+          <button class="btn btn--secondary btn--slim" id="clear-all-btn">&#128465; Clear All Data</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: analytics panel -->
+    <div class="workout-body__right">
+
+      <div class="analytics-block">
+        <div class="section-label">WEEKLY MUSCLE VOLUME</div>
+        <p class="analytics-sub">Direct working sets only</p>
+
+        <table class="analytics-table" id="volume-table">
+          <thead>
+            <tr>
+              <th>Muscle Group</th>
+              <th>Direct Sets</th>
+              <th>Suggested Range</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="volume-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="analytics-block" id="breakdown-block">
+        <div class="section-label">MUSCLE BREAKDOWN</div>
+        <div id="breakdown-list"></div>
+      </div>
+
+      <p class="analytics-disclaimer">
+        &#9432; Suggested ranges are starting points. Adjust based on your goals, recovery, and experience.
+      </p>
+    </div>
+
+  </div>
+
+  <footer class="disclaimer">
+    <p>Volume and frequency ranges reflect general resistance-training research summaries, not personalized medical or coaching advice.</p>
+    <p>No account required. No personal data is collected — everything is stored locally in your browser.</p>
+  </footer>
+
+</main>
+
+<!-- ===================== ADD / EDIT EXERCISE MODAL ===================== -->
+<div class="modal-overlay is-hidden" id="exercise-modal-overlay">
+  <div class="modal" id="exercise-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__header">
+      <h2 class="modal__title" id="modal-title">Add Exercise</h2>
+      <button class="modal__close" id="modal-close-btn" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal__body">
+      <div class="field">
+        <label class="field__label" for="ex-name">Exercise Name</label>
+        <input type="text" id="ex-name" placeholder="e.g. Barbell Bench Press" maxlength="80" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="field__label" for="ex-primary">Primary Muscle Target</label>
+        <select id="ex-primary">
+          <option value="" disabled selected>Select muscle</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label" for="ex-secondary">Secondary Muscle Target <span class="optional-tag">(optional)</span></label>
+        <select id="ex-secondary">
+          <option value="">None</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field__label" for="ex-sets">Working Sets</label>
+          <input type="number" id="ex-sets" min="1" max="20" step="1" value="3">
+        </div>
+        <div class="field">
+          <label class="field__label" for="ex-reps">Rep Range</label>
+          <input type="text" id="ex-reps" placeholder="e.g. 8–12" maxlength="20" value="8–12">
+        </div>
+        <div class="field">
+          <label class="field__label" for="ex-rest">Rest Time <span class="optional-tag">(opt.)</span></label>
+          <input type="text" id="ex-rest" placeholder="e.g. 2–3 min" maxlength="20">
+        </div>
+      </div>
+      <p class="field-note">Working sets only — exclude warm-up sets from this count.</p>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--secondary" id="modal-cancel-btn">Cancel</button>
+      <button class="btn btn--primary" id="modal-save-btn">Add Exercise</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DAY NAME MODAL ===================== -->
+<div class="modal-overlay is-hidden" id="day-modal-overlay">
+  <div class="modal modal--narrow" role="dialog" aria-modal="true" aria-labelledby="day-modal-title">
+    <div class="modal__header">
+      <h2 class="modal__title" id="day-modal-title">Set Day Name</h2>
+      <button class="modal__close" id="day-modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal__body">
+      <div class="field">
+        <label class="field__label" for="day-name-input">Workout Name</label>
+        <input type="text" id="day-name-input" placeholder="e.g. Push, Pull, Legs, Upper…" maxlength="40" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--secondary" id="day-modal-cancel">Cancel</button>
+      <button class="btn btn--primary" id="day-modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/workoutData.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/workout.js"></script>
+</body>
+</html>
